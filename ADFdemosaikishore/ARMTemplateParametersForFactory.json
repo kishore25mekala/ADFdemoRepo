@@ -1,0 +1,33 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "ADFdemosaikishore"
+		},
+		"Linkedservice_SqlServe_password": {
+			"value": ""
+		},
+		"Linkedservice_storageDemoKishore_connectionString": {
+			"value": ""
+		},
+		"Linkedservice_SqlServe_properties_typeProperties_server": {
+			"value": "Mydbserver.windows.db.net"
+		},
+		"Linkedservice_SqlServe_properties_typeProperties_database": {
+			"value": "@{linkedService().dbName}"
+		},
+		"Linkedservice_SqlServe_properties_typeProperties_userName": {
+			"value": "rammaaa"
+		},
+		"SqlServer1_properties_typeProperties_server": {
+			"value": "@{linkedService().servername}"
+		},
+		"SqlServer1_properties_typeProperties_database": {
+			"value": "@{linkedService().dbName}"
+		},
+		"SqlServer1_properties_typeProperties_userName": {
+			"value": "@{linkedService().username}"
+		}
+	}
+}

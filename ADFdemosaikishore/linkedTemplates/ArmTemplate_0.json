@@ -1,0 +1,898 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "ADFdemosaikishore"
+		},
+		"Linkedservice_SqlServe_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'Linkedservice_SqlServe'"
+		},
+		"Linkedservice_storageDemoKishore_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'Linkedservice_storageDemoKishore'"
+		},
+		"Linkedservice_SqlServe_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "Mydbserver.windows.db.net"
+		},
+		"Linkedservice_SqlServe_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "@{linkedService().dbName}"
+		},
+		"Linkedservice_SqlServe_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "rammaaa"
+		},
+		"SqlServer1_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "@{linkedService().servername}"
+		},
+		"SqlServer1_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "@{linkedService().dbName}"
+		},
+		"SqlServer1_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "@{linkedService().username}"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/Waitpipeline6')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Wait1",
+						"type": "Wait",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"waitTimeInSeconds": 1
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Linkedservice_SqlServe')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"parameters": {
+					"dbName": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "SqlServer",
+				"typeProperties": {
+					"server": "[parameters('Linkedservice_SqlServe_properties_typeProperties_server')]",
+					"database": "[parameters('Linkedservice_SqlServe_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('Linkedservice_SqlServe_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('Linkedservice_SqlServe_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Linkedservice_storageDemoKishore')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('Linkedservice_storageDemoKishore_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SqlServer1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"parameters": {
+					"servername": {
+						"type": "string"
+					},
+					"dbName": {
+						"type": "string"
+					},
+					"username": {
+						"type": "string"
+					},
+					"password": {
+						"type": "string"
+					},
+					"daname2": {
+						"type": "string"
+					},
+					"dbname3": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "SqlServer",
+				"typeProperties": {
+					"server": "[parameters('SqlServer1_properties_typeProperties_server')]",
+					"database": "[parameters('SqlServer1_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('SqlServer1_properties_typeProperties_userName')]",
+					"password": "@{linkedService().password}"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Department_Dataset')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Linkedservice_storageDemoKishore",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "DEPARTB_1.csv",
+						"folderPath": "Input",
+						"container": "adfdemo"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "DEPID",
+						"type": "String"
+					},
+					{
+						"name": "DEPNAME",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Linkedservice_storageDemoKishore')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DervidedDataset')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Linkedservice_storageDemoKishore",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"folderPath": "output",
+						"container": "adfdemo"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "EMPID",
+						"type": "String"
+					},
+					{
+						"name": "EMPNAME",
+						"type": "String"
+					},
+					{
+						"name": "EMPROLE",
+						"type": "String"
+					},
+					{
+						"name": "DEPARTMENT",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Linkedservice_storageDemoKishore')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Destination')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Linkedservice_storageDemoKishore",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"folderPath": "output",
+						"container": "adfdemo"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Linkedservice_storageDemoKishore')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/EmployeeDataset')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Linkedservice_storageDemoKishore",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "EMPTB_1.csv",
+						"folderPath": "Input",
+						"container": "adfdemo"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "EMPID",
+						"type": "String"
+					},
+					{
+						"name": "EMPNAME",
+						"type": "String"
+					},
+					{
+						"name": "EMPROLE",
+						"type": "String"
+					},
+					{
+						"name": "DEPARTMENT",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Linkedservice_storageDemoKishore')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/EmployeeJson1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Linkedservice_storageDemoKishore",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "employees.json",
+						"folderPath": "Input",
+						"container": "adfdemo"
+					}
+				},
+				"schema": {
+					"type": "object",
+					"properties": {
+						"Employees": {
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"userId": {
+										"type": "string"
+									},
+									"jobTitleName": {
+										"type": "string"
+									},
+									"firstName": {
+										"type": "string"
+									},
+									"lastName": {
+										"type": "string"
+									},
+									"skills": {
+										"type": "array",
+										"items": {
+											"type": "string"
+										}
+									},
+									"preferredFullName": {
+										"type": "string"
+									},
+									"employeeCode": {
+										"type": "string"
+									},
+									"region": {
+										"type": "string"
+									},
+									"phoneNumber": {
+										"type": "string"
+									},
+									"emailAddress": {
+										"type": "string"
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Linkedservice_storageDemoKishore')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Employee_Dataset')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Linkedservice_storageDemoKishore",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "EMPTB_1.csv",
+						"folderPath": "Input",
+						"container": "adfdemo"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "EMPID",
+						"type": "String"
+					},
+					{
+						"name": "EMPNAME",
+						"type": "String"
+					},
+					{
+						"name": "EMPROLE",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Linkedservice_storageDemoKishore')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Employees')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Linkedservice_storageDemoKishore",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "Employees.csv",
+						"folderPath": "Input",
+						"container": "adfdemo"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "EMPLOYEE_ID",
+						"type": "String"
+					},
+					{
+						"name": "FIRST_NAME",
+						"type": "String"
+					},
+					{
+						"name": "LAST_NAME",
+						"type": "String"
+					},
+					{
+						"name": "EMAIL",
+						"type": "String"
+					},
+					{
+						"name": "PHONE_NUMBER",
+						"type": "String"
+					},
+					{
+						"name": "HIRE_DATE",
+						"type": "String"
+					},
+					{
+						"name": "JOB_ID",
+						"type": "String"
+					},
+					{
+						"name": "SALARY",
+						"type": "String"
+					},
+					{
+						"name": "Prop_8",
+						"type": "String"
+					},
+					{
+						"name": "MANAGER_ID",
+						"type": "String"
+					},
+					{
+						"name": "DEPARTMENT_ID",
+						"type": "String"
+					},
+					{
+						"name": "Prop_11",
+						"type": "String"
+					},
+					{
+						"name": "DEPARTMENT SECTION",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Linkedservice_storageDemoKishore')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Inputdatadataset')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Linkedservice_storageDemoKishore",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "TeamsDoc.txt",
+						"folderPath": "Input",
+						"container": "adfdemo"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Linkedservice_storageDemoKishore')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/OoutputDataset')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Linkedservice_storageDemoKishore",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"folderPath": "output",
+						"container": "adfdemo"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Linkedservice_storageDemoKishore')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SalesFile_Dataset')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Linkedservice_storageDemoKishore",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "SALESTB_1.csv",
+						"folderPath": "Input",
+						"container": "adfdemo"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "SALEID",
+						"type": "String"
+					},
+					{
+						"name": "CUSTOMERID",
+						"type": "String"
+					},
+					{
+						"name": "SALE DATE",
+						"type": "String"
+					},
+					{
+						"name": "SALE AMOUNT",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Linkedservice_storageDemoKishore')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SourceCSVfile')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Linkedservice_storageDemoKishore",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "Appstore.csv",
+						"folderPath": "Input",
+						"container": "adfdemo"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "products",
+						"type": "String"
+					},
+					{
+						"name": "count",
+						"type": "String"
+					},
+					{
+						"name": "location",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Linkedservice_storageDemoKishore')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SqlDataTable1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Linkedservice_SqlServe",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"dbName": {
+							"value": "@dataset().DBnameFromDataset",
+							"type": "Expression"
+						}
+					}
+				},
+				"parameters": {
+					"tablename": {
+						"type": "string"
+					},
+					"DBnameFromDataset": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": {
+						"value": "@dataset().tablename",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Linkedservice_SqlServe')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/TotalEmpBydeparmentDataset')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Linkedservice_storageDemoKishore",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"folderPath": "output",
+						"container": "adfdemo"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Linkedservice_storageDemoKishore')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/outputdataset')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Linkedservice_storageDemoKishore",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "TeamsDoc.txt",
+						"folderPath": "output",
+						"container": "adfdemo"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Linkedservice_storageDemoKishore')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pipeline1')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy data1",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "BinarySource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true
+								},
+								"formatSettings": {
+									"type": "BinaryReadSettings"
+								}
+							},
+							"sink": {
+								"type": "BinarySink",
+								"storeSettings": {
+									"type": "AzureBlobStorageWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "Inputdatadataset",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "outputdataset",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": [],
+				"lastPublishTime": "2024-06-21T07:29:58Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/Inputdatadataset')]",
+				"[concat(variables('factoryId'), '/datasets/outputdataset')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pipeline2')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy data1",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [
+							{
+								"name": "Source",
+								"value": "dbo.@{pipeline().parameters.SourceTablefrompipeline}"
+							},
+							{
+								"name": "Destination",
+								"value": "dbo.@{pipeline().parameters.DestinationTablefrompipeline}"
+							}
+						],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "SqlServerSink",
+								"writeBehavior": "insert",
+								"sqlWriterUseTableLock": false
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "SqlDataTable1",
+								"type": "DatasetReference",
+								"parameters": {
+									"tablename": {
+										"value": "@pipeline().parameters.SourceTablefrompipeline",
+										"type": "Expression"
+									},
+									"DBnameFromDataset": {
+										"value": "@pipeline().parameters.dbnamefrompipeline",
+										"type": "Expression"
+									}
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "SqlDataTable1",
+								"type": "DatasetReference",
+								"parameters": {
+									"tablename": {
+										"value": "@pipeline().parameters.DestinationTablefrompipeline",
+										"type": "Expression"
+									},
+									"DBnameFromDataset": {
+										"value": "@pipeline().parameters.dbnamefrompipeline",
+										"type": "Expression"
+									}
+								}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"SourceTablefrompipeline": {
+						"type": "string"
+					},
+					"dbnamefrompipeline": {
+						"type": "string"
+					},
+					"DestinationTablefrompipeline": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"lastPublishTime": "2024-06-21T11:25:35Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/SqlDataTable1')]"
+			]
+		}
+	]
+}

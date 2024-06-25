@@ -1,0 +1,138 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "ADFdemosaikishore"
+		},
+		"Linkedservice_SqlServe_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'Linkedservice_SqlServe'"
+		},
+		"Linkedservice_storageDemoKishore_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'Linkedservice_storageDemoKishore'"
+		},
+		"Linkedservice_SqlServe_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "Mydbserver.windows.db.net"
+		},
+		"Linkedservice_SqlServe_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "@{linkedService().dbName}"
+		},
+		"Linkedservice_SqlServe_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "rammaaa"
+		},
+		"SqlServer1_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "@{linkedService().servername}"
+		},
+		"SqlServer1_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "@{linkedService().dbName}"
+		},
+		"SqlServer1_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "@{linkedService().username}"
+		},
+		"containerUri": {
+			"type": "string",
+			"metadata": "URI to storage account containing linked ARM templates"
+		},
+		"containerSasToken": {
+			"type": "string",
+			"metadata": "Sas token to storage account containing linked ARM templates"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "ADFdemosaikishore_ArmTemplate_0",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_0.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					},
+					"Linkedservice_SqlServe_password": {
+						"value": "[parameters('Linkedservice_SqlServe_password')]"
+					},
+					"Linkedservice_storageDemoKishore_connectionString": {
+						"value": "[parameters('Linkedservice_storageDemoKishore_connectionString')]"
+					},
+					"Linkedservice_SqlServe_properties_typeProperties_server": {
+						"value": "[parameters('Linkedservice_SqlServe_properties_typeProperties_server')]"
+					},
+					"Linkedservice_SqlServe_properties_typeProperties_database": {
+						"value": "[parameters('Linkedservice_SqlServe_properties_typeProperties_database')]"
+					},
+					"Linkedservice_SqlServe_properties_typeProperties_userName": {
+						"value": "[parameters('Linkedservice_SqlServe_properties_typeProperties_userName')]"
+					},
+					"SqlServer1_properties_typeProperties_server": {
+						"value": "[parameters('SqlServer1_properties_typeProperties_server')]"
+					},
+					"SqlServer1_properties_typeProperties_database": {
+						"value": "[parameters('SqlServer1_properties_typeProperties_database')]"
+					},
+					"SqlServer1_properties_typeProperties_userName": {
+						"value": "[parameters('SqlServer1_properties_typeProperties_userName')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "ADFdemosaikishore_ArmTemplate_1",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_1.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'ADFdemosaikishore_ArmTemplate_0')]"
+			]
+		},
+		{
+			"name": "ADFdemosaikishore_ArmTemplate_2",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_2.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'ADFdemosaikishore_ArmTemplate_1')]"
+			]
+		}
+	]
+}

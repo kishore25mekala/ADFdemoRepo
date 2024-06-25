@@ -1,0 +1,50 @@
+{
+	"name": "SortDataflow",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "SalesFile_Dataset",
+						"type": "DatasetReference"
+					},
+					"name": "sortOnSales"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "OoutputDataset",
+						"type": "DatasetReference"
+					},
+					"name": "salessink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "Sales"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          SALEID as string,",
+				"          CUSTOMERID as string,",
+				"          {SALE DATE} as string,",
+				"          {SALE AMOUNT} as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> sortOnSales",
+				"sortOnSales sort(desc(SALEID, true),",
+				"     desc({SALE AMOUNT}, true)) ~> Sales",
+				"Sales sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['SalesFile.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> salessink1"
+			]
+		}
+	}
+}

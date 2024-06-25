@@ -1,0 +1,66 @@
+{
+	"name": "EmployeeJson1",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Linkedservice_storageDemoKishore",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "employees.json",
+				"folderPath": "Input",
+				"container": "adfdemo"
+			}
+		},
+		"schema": {
+			"type": "object",
+			"properties": {
+				"Employees": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"userId": {
+								"type": "string"
+							},
+							"jobTitleName": {
+								"type": "string"
+							},
+							"firstName": {
+								"type": "string"
+							},
+							"lastName": {
+								"type": "string"
+							},
+							"skills": {
+								"type": "array",
+								"items": {
+									"type": "string"
+								}
+							},
+							"preferredFullName": {
+								"type": "string"
+							},
+							"employeeCode": {
+								"type": "string"
+							},
+							"region": {
+								"type": "string"
+							},
+							"phoneNumber": {
+								"type": "string"
+							},
+							"emailAddress": {
+								"type": "string"
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

@@ -1,0 +1,65 @@
+{
+	"name": "ExistsDataflow",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "EmployeeDataset",
+						"type": "DatasetReference"
+					},
+					"name": "ExistsourceFile"
+				},
+				{
+					"dataset": {
+						"referenceName": "Department_Dataset",
+						"type": "DatasetReference"
+					},
+					"name": "DepartmentSource"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "OoutputDataset",
+						"type": "DatasetReference"
+					},
+					"name": "Existsink"
+				}
+			],
+			"transformations": [
+				{
+					"name": "exists1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          EMPID as string,",
+				"          EMPNAME as string,",
+				"          EMPROLE as string,",
+				"          DEPARTMENT as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> ExistsourceFile",
+				"source(output(",
+				"          DEPID as string,",
+				"          DEPNAME as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> DepartmentSource",
+				"ExistsourceFile, DepartmentSource exists(EMPROLE == DEPNAME,",
+				"     negate:true,",
+				"     broadcast: 'auto')~> exists1",
+				"exists1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['NotExistsFile.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> Existsink"
+			]
+		}
+	}
+}

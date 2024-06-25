@@ -1,0 +1,54 @@
+{
+	"name": "Selectdataflow1",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "SalesFile_Dataset",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "OoutputDataset",
+						"type": "DatasetReference"
+					},
+					"name": "outputsink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "select1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          SALEID as string,",
+				"          CUSTOMERID as string,",
+				"          {SALE DATE} as string,",
+				"          {SALE AMOUNT} as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"source1 select(mapColumn(",
+				"          customerID = CUSTOMERID,",
+				"          {Sales ID} = SALEID,",
+				"          {sales date} = {SALE DATE},",
+				"          {sales amount} = {SALE AMOUNT}",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> outputsink1"
+			]
+		}
+	}
+}

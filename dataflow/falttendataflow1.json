@@ -1,0 +1,58 @@
+{
+	"name": "falttendataflow1",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "EmployeeJson1",
+						"type": "DatasetReference"
+					},
+					"name": "EmployeeJson"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "OoutputDataset",
+						"type": "DatasetReference"
+					},
+					"name": "Flattensink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "flatten1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          Employees as (userId as string, jobTitleName as string, firstName as string, lastName as string, skills as string[], preferredFullName as string, employeeCode as string, region as string, phoneNumber as string, emailAddress as string)[]",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     documentForm: 'singleDocument') ~> EmployeeJson",
+				"EmployeeJson foldDown(unroll(Employees.skills),",
+				"     mapColumn(",
+				"          Employees",
+				"     ),",
+				"     partitionBy('hash', 1),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> flatten1",
+				"EmployeeJson sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['FlattenFile.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     mapColumn(",
+				"          Employees = Employees[1].userId,",
+				"          skills = Employees[1].skills,",
+				"          employeeCode = Employees[1].employeeCode",
+				"     ),",
+				"     partitionBy('hash', 1)) ~> Flattensink1"
+			]
+		}
+	}
+}

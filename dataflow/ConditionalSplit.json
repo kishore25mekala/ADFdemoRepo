@@ -1,0 +1,58 @@
+{
+	"name": "ConditionalSplit",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "EmployeeDataset",
+						"type": "DatasetReference"
+					},
+					"name": "AllEmployees"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "OoutputDataset",
+						"type": "DatasetReference"
+					},
+					"name": "OutPutSink"
+				}
+			],
+			"transformations": [
+				{
+					"name": "split1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          EMPID as string,",
+				"          EMPNAME as string,",
+				"          EMPROLE as string,",
+				"          DEPARTMENT as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> AllEmployees",
+				"AllEmployees split(equals(DEPARTMENT, \"1\"),",
+				"     equals(DEPARTMENT, \"2\"),",
+				"     equals(DEPARTMENT, \"3\"),",
+				"     disjoint: false) ~> split1@(ITEmployess, HREmployess, PayRollEmployees, OtherEmployess)",
+				"split1@ITEmployess sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['TotalEmployBasedOnSplit.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     mapColumn(",
+				"          EMPID,",
+				"          EMPNAME,",
+				"          EMPROLE,",
+				"          DEPARTMENT",
+				"     ),",
+				"     partitionBy('hash', 1)) ~> OutPutSink"
+			]
+		}
+	}
+}

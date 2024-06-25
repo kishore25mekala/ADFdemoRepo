@@ -1,0 +1,72 @@
+{
+	"name": "EmpDepDataflow",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "Employee_Dataset",
+						"type": "DatasetReference"
+					},
+					"name": "EmployeeData"
+				},
+				{
+					"dataset": {
+						"referenceName": "Department_Dataset",
+						"type": "DatasetReference"
+					},
+					"name": "DepartmentData"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "OoutputDataset",
+						"type": "DatasetReference"
+					},
+					"name": "OutPutData"
+				}
+			],
+			"transformations": [
+				{
+					"name": "JoinEmpDataDepartmentData"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          EMPID as string,",
+				"          EMPNAME as string,",
+				"          EMPROLE as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> EmployeeData",
+				"source(output(",
+				"          DEPID as string,",
+				"          DEPNAME as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> DepartmentData",
+				"EmployeeData, DepartmentData join(EMPID == DEPID,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> JoinEmpDataDepartmentData",
+				"JoinEmpDataDepartmentData sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['EmpDepratData'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     mapColumn(",
+				"          EMPID,",
+				"          EMPLOYNAME = EMPNAME,",
+				"          EMPROLE,",
+				"          DEPNAME",
+				"     ),",
+				"     partitionBy('hash', 1)) ~> OutPutData"
+			]
+		}
+	}
+}

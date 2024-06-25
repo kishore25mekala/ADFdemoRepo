@@ -1,0 +1,63 @@
+{
+	"name": "Uniondataflow",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "EmployeeDataset",
+						"type": "DatasetReference"
+					},
+					"name": "ITEMPOYEES"
+				},
+				{
+					"dataset": {
+						"referenceName": "Department_Dataset",
+						"type": "DatasetReference"
+					},
+					"name": "HRDEAPRTMENT"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "OoutputDataset",
+						"type": "DatasetReference"
+					},
+					"name": "Unionsink"
+				}
+			],
+			"transformations": [
+				{
+					"name": "unionDataflow"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          EMPID as string,",
+				"          EMPNAME as string,",
+				"          EMPROLE as string,",
+				"          DEPARTMENT as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> ITEMPOYEES",
+				"source(output(",
+				"          DEPID as string,",
+				"          DEPNAME as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> HRDEAPRTMENT",
+				"ITEMPOYEES, HRDEAPRTMENT union(byName: true)~> unionDataflow",
+				"unionDataflow sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['UnionFile.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> Unionsink"
+			]
+		}
+	}
+}

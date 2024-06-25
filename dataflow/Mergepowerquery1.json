@@ -1,0 +1,28 @@
+{
+	"name": "Mergepowerquery1",
+	"properties": {
+		"type": "WranglingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"name": "Employee_Dataset",
+					"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> Employee_Dataset",
+					"dataset": {
+						"referenceName": "Employee_Dataset",
+						"type": "DatasetReference"
+					}
+				},
+				{
+					"name": "Department_Dataset",
+					"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> Department_Dataset",
+					"dataset": {
+						"referenceName": "Department_Dataset",
+						"type": "DatasetReference"
+					}
+				}
+			],
+			"script": "section Section1;\r\nshared Employee_Dataset = let AdfDoc = AzureStorage.BlobContents(\"https://storagedemokishore.blob.core.windows.net/adfdemo/Input/EMPTB_1.csv\"),Csv = Csv.Document(AdfDoc, [Delimiter = \",\", Encoding = TextEncoding.Utf8, QuoteStyle = QuoteStyle.Csv]), PromotedHeaders = Table.PromoteHeaders(Csv, [PromoteAllScalars = true]) in  PromotedHeaders;\r\nshared Department_Dataset = let AdfDoc = AzureStorage.BlobContents(\"https://storagedemokishore.blob.core.windows.net/adfdemo/Input/DEPARTB_1.csv\"),Csv = Csv.Document(AdfDoc, [Delimiter = \",\", Encoding = TextEncoding.Utf8, QuoteStyle = QuoteStyle.Csv]), PromotedHeaders = Table.PromoteHeaders(Csv, [PromoteAllScalars = true]) in  PromotedHeaders;\r\nshared UserQuery = let Source = #\"Employee_Dataset\",\r\n  #\"Merged queries\" = Table.NestedJoin(Source, {\"EMPID\"}, Department_Dataset, {\"DEPID\"}, \"Department_Dataset\", JoinKind.Inner),\r\n  #\"Expanded Department_Dataset\" = Table.ExpandTableColumn(#\"Merged queries\", \"Department_Dataset\", {\"DEPID\", \"DEPNAME\"}, {\"DEPID\", \"DEPNAME\"}) in #\"Expanded Department_Dataset\";\r\n",
+			"documentLocale": "en-us"
+		}
+	}
+}

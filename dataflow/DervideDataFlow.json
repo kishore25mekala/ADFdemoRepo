@@ -1,0 +1,56 @@
+{
+	"name": "DervideDataFlow",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "EmployeeDataset",
+						"type": "DatasetReference"
+					},
+					"name": "ModifyEmployees"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DervidedDataset",
+						"type": "DatasetReference"
+					},
+					"name": "DerivedFile"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedColumn1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          EMPID as string,",
+				"          EMPNAME as string,",
+				"          EMPROLE as string,",
+				"          DEPARTMENT as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> ModifyEmployees",
+				"ModifyEmployees derive(EMPROLE = upper(EMPNAME),",
+				"          newCountryColumn = iifNull(DEPARTMENT, 'unknown')) ~> derivedColumn1",
+				"derivedColumn1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          EMPID as string,",
+				"          EMPNAME as string,",
+				"          EMPROLE as string,",
+				"          DEPARTMENT as string",
+				"     ),",
+				"     partitionFileNames:['Dervidefile.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> DerivedFile"
+			]
+		}
+	}
+}

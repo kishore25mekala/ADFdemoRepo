@@ -1,0 +1,9 @@
+{
+	"name": "ADFdemosaikishore",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "012b5e64-36a5-4eb4-abce-403b3c1c1753",
+		"tenantId": "17a53ae3-06a7-4563-bce2-07880e182d50"
+	}
+}

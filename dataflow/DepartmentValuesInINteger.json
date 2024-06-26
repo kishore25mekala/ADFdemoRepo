@@ -1,0 +1,14 @@
+{
+	"name": "DepartmentValuesInINteger",
+	"properties": {
+		"type": "UDFLibrary",
+		"typeProperties": {
+			"sources": [],
+			"sinks": [],
+			"transformations": [],
+			"scriptLines": [
+				"DepartnetValuesInInteger(string) as integer = iif(i1=='1',-1,iif(i1=='2',0,-1))"
+			]
+		}
+	}
+}

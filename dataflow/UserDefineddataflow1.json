@@ -1,0 +1,36 @@
+{
+	"name": "UserDefineddataflow1",
+	"properties": {
+		"description": "here we have to use user defined values ",
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "Employ",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [],
+			"transformations": [
+				{
+					"name": "derivedColumn1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          EMPID as string,",
+				"          EMPNAME as string,",
+				"          Country as string,",
+				"          DEPARTMENT as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"source1 derive(DEPARTMENT = iif(DEPARTMENT=='1',-1,iif(DEPARTMENT=='2',0,-1))) ~> derivedColumn1"
+			]
+		}
+	}
+}

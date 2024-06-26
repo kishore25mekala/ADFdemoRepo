@@ -19,6 +19,12 @@
 					"name": "derivedColumn1"
 				}
 			],
+			"udfLibraries": [
+				{
+					"referenceName": "DepartmentValuesInINteger",
+					"type": "DataFlowReference"
+				}
+			],
 			"scriptLines": [
 				"source(output(",
 				"          EMPID as string,",
@@ -29,7 +35,7 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false) ~> source1",
-				"source1 derive(DEPARTMENT = iif(DEPARTMENT=='1',-1,iif(DEPARTMENT=='2',0,-1))) ~> derivedColumn1"
+				"source1 derive(DEPARTMENT = DepartnetValuesInInteger(DEPARTMENT)) ~> derivedColumn1"
 			]
 		}
 	}

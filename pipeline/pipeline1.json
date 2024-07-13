@@ -13,7 +13,16 @@
 					"secureOutput": false,
 					"secureInput": false
 				},
-				"userProperties": [],
+				"userProperties": [
+					{
+						"name": "Source",
+						"value": "adfdemo/Input/TeamsDoc.txt"
+					},
+					{
+						"name": "Destination",
+						"value": "dbo.@{'<tablename>'}"
+					}
+				],
 				"typeProperties": {
 					"source": {
 						"type": "BinarySource",
@@ -26,10 +35,9 @@
 						}
 					},
 					"sink": {
-						"type": "BinarySink",
-						"storeSettings": {
-							"type": "AzureBlobStorageWriteSettings"
-						}
+						"type": "SqlServerSink",
+						"writeBehavior": "insert",
+						"sqlWriterUseTableLock": false
 					},
 					"enableStaging": false
 				},
@@ -41,7 +49,7 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "outputdataset",
+						"referenceName": "SqlDataTable1",
 						"type": "DatasetReference"
 					}
 				]

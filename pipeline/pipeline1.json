@@ -69,6 +69,17 @@
 				]
 			}
 		],
+		"variables": {
+			"filetype": {
+				"type": "String"
+			},
+			"hrly": {
+				"type": "String"
+			},
+			"daily": {
+				"type": "String"
+			}
+		},
 		"annotations": [],
 		"lastPublishTime": "2024-06-21T07:29:58Z"
 	},

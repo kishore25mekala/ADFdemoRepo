@@ -3,99 +3,86 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Copy data1",
-				"type": "Copy",
+				"name": "Set variable1",
+				"type": "SetVariable",
 				"dependsOn": [],
 				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
 					"secureOutput": false,
 					"secureInput": false
 				},
-				"userProperties": [
-					{
-						"name": "Source",
-						"value": "adfdemo/Input/Appstore.csv"
-					},
-					{
-						"name": "Destination",
-						"value": "adfdemo/output/"
-					}
-				],
+				"userProperties": [],
 				"typeProperties": {
-					"source": {
-						"type": "DelimitedTextSource",
-						"storeSettings": {
-							"type": "AzureBlobStorageReadSettings",
-							"recursive": true,
-							"enablePartitionDiscovery": false
-						},
-						"formatSettings": {
-							"type": "DelimitedTextReadSettings"
-						}
-					},
-					"sink": {
-						"type": "DelimitedTextSink",
-						"storeSettings": {
-							"type": "AzureBlobStorageWriteSettings"
-						},
-						"formatSettings": {
-							"type": "DelimitedTextWriteSettings",
-							"quoteAllText": true,
-							"fileExtension": ".txt"
-						}
-					},
-					"enableStaging": false,
-					"translator": {
-						"type": "TabularTranslator",
-						"mappings": [
-							{
-								"source": {
-									"name": "count",
-									"type": "String",
-									"physicalType": "String"
-								},
-								"sink": {
-									"name": "count",
-									"type": "String",
-									"physicalType": "String"
-								}
-							},
-							{
-								"source": {
-									"name": "products",
-									"type": "String",
-									"physicalType": "String"
-								},
-								"sink": {
-									"name": "products",
-									"type": "String",
-									"physicalType": "String"
-								}
-							}
-						],
-						"typeConversion": true,
-						"typeConversionSettings": {
-							"allowDataTruncation": true,
-							"treatBooleanAsNumber": false
-						}
-					}
-				},
-				"inputs": [
+					"variableName": "hrly",
+					"value": "@replace(pipeline().parameters.FileName ,‘sales’,”)"
+				}
+			},
+			{
+				"name": "If Condition1",
+				"type": "IfCondition",
+				"dependsOn": [
 					{
-						"referenceName": "SourceCSVfile",
-						"type": "DatasetReference"
+						"activity": "Set variable1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
 					}
 				],
-				"outputs": [
-					{
-						"referenceName": "Destination",
-						"type": "DatasetReference"
-					}
-				]
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@variables('hrly')",
+						"type": "Expression"
+					},
+					"ifFalseActivities": [
+						{
+							"name": "Copy data2",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"enableStaging": false
+							}
+						}
+					],
+					"ifTrueActivities": [
+						{
+							"name": "Copy data1",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"enableStaging": false
+							}
+						}
+					]
+				}
 			}
 		],
+		"variables": {
+			"filetype": {
+				"type": "String"
+			},
+			"hrly": {
+				"type": "String"
+			},
+			"daily": {
+				"type": "String"
+			}
+		},
 		"annotations": [],
 		"lastPublishTime": "2024-06-22T11:40:14Z"
 	},
